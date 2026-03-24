@@ -1,19 +1,24 @@
-task_table = """
-    CREATE TABLE IF NOT EXISTS tasks (
+shopping_table = """
+    CREATE TABLE IF NOT EXISTS shopping (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        task TEXT NOT NULL,
-        completed INTEGER DEFAULT 0
+        item TEXT NOT NULL,
+        quantity TEXT NOT NULL,
+        purchased INTEGER DEFAULT 0
     )
 """
 
-insert_task = "INSERT INTO tasks (task) VALUES (?)"
+# CRUD: Create - Read - Update - Delete
+# INSERT SELECT UPDATE DELETE
 
-# One query handles all filters — cleaner!
-select_task = "SELECT id, task, completed FROM tasks{}"
+insert_item = "INSERT INTO shopping (item, quantity) VALUES (?, ?)"
 
-update_task_text = "UPDATE tasks SET task = ? WHERE id = ?"
-update_task_completed = "UPDATE tasks SET completed = ? WHERE id = ?"
-update_both = "UPDATE tasks SET task = ?, completed = ? WHERE id = ?"
+select_all = "SELECT id, item, quantity, purchased FROM shopping"
 
-delete_task = "DELETE FROM tasks WHERE id = ?"
+select_purchased = "SELECT id, item, quantity, purchased FROM shopping WHERE purchased = 1"
+select_unpurchased = "SELECT id, item, quantity, purchased FROM shopping WHERE purchased = 0"
 
+update_item = "UPDATE shopping SET purchased = ? WHERE id = ?"
+
+delete_item = "DELETE FROM shopping WHERE id = ?"
+
+count_purchased = "SELECT COUNT(*) FROM shopping WHERE purchased = 1"

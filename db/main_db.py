@@ -3,15 +3,11 @@ from db import queries
 from config import path_db
 import os
 
-# ✅ makedirs only once, not on every query
-def init_db():
-    db_dir = os.path.dirname(path_db)
-    if db_dir:
-        os.makedirs(db_dir, exist_ok=True)  # exist_ok avoids the extra if-check
-    _execute_query(queries.task_table)
-    print(f'DB connected: {path_db}')
-
 def _execute_query(query, params=(), fetch=False):
+    db_dir = os.path.dirname(path_db)
+    if db_dir and not os.path.exists(db_dir):
+        os.makedirs(db_dir)
+
     conn = sqlite3.connect(path_db)
     try:
         with conn:
@@ -23,26 +19,36 @@ def _execute_query(query, params=(), fetch=False):
     finally:
         conn.close()
 
-def add_task(task):
-    return _execute_query(queries.insert_task, (task,))
 
-def update_task(task_id, new_task=None, completed=None):
-    # ✅ Update both fields in ONE query if needed
-    if new_task is not None and completed is not None:
-        _execute_query(queries.update_both, (new_task, int(completed), task_id))
-    elif new_task is not None:
-        _execute_query(queries.update_task_text, (new_task, task_id))
-    elif completed is not None:
-        _execute_query(queries.update_task_completed, (int(completed), task_id))
+def init_db():
+    _execute_query(queries.shopping_table)
+    print(f'DB connected: {path_db}')
 
-def delete_task(task_id):
-    _execute_query(queries.delete_task, (task_id,))
 
-def get_tasks(filter_type='all'):
-    # ✅ One query, dynamic WHERE clause
-    filters = {
-        'completed':   ' WHERE completed = 1',
-        'uncompleted': ' WHERE completed = 0',
-    }
-    where = filters.get(filter_type, '')
-    return _execute_query(queries.select_task.format(where), fetch=True)
+def add_item(item, quantity):
+    return _execute_query(queries.insert_item, (item, quantity))
+
+
+def mark_purchased(item_id, is_purchased):
+    _execute_query(queries.update_item, (int(is_purchased), item_id))
+
+
+def delete_item(item_id):
+    _execute_query(queries.delete_item, (item_id,))
+
+    
+
+
+# def get_items(filter_type):
+#     if filter_type == 'all':
+#         return _execute_query(queries.select_all, fetch=True)
+#     elif filter_type == 'purchased':
+#         return _execute_query(queries.select_purchased, fetch=True)
+#     elif filter_type == 'unpurchased':
+#         return _execute_query(queries.select_unpurchased, fetch=True)
+#     return []
+
+
+def get_purchased_count():
+    result = _execute_query(queries.count_purchased, fetch=True)
+    return result[0][0]
