@@ -36,17 +36,15 @@ def mark_purchased(item_id, is_purchased):
 def delete_item(item_id):
     _execute_query(queries.delete_item, (item_id,))
 
-    
 
-
-# def get_items(filter_type):
-#     if filter_type == 'all':
-#         return _execute_query(queries.select_all, fetch=True)
-#     elif filter_type == 'purchased':
-#         return _execute_query(queries.select_purchased, fetch=True)
-#     elif filter_type == 'unpurchased':
-#         return _execute_query(queries.select_unpurchased, fetch=True)
-#     return []
+def get_items(filter_type):
+    if filter_type == 'all':
+        return _execute_query(queries.select_all, fetch=True)
+    elif filter_type == 'purchased':
+        return _execute_query(queries.select_purchased, fetch=True)
+    elif filter_type == 'unpurchased':
+        return _execute_query(queries.select_unpurchased, fetch=True)
+    return[]
 
 
 def get_purchased_count():
