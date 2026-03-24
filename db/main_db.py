@@ -43,3 +43,7 @@ def get_tasks(filter_type):
     elif filter_type == 'uncompleted':
         return _execute_query(queries.select_task_uncompleted, fetch=True)
     return []
+
+
+def delete_completed_tasks():
+    return _execute_query(queries.delete_completed_tasks)

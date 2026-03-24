@@ -3,9 +3,41 @@ from db import main_db
 import os
 import datetime
 
+
 def main(page: ft.Page):
     page.title = 'ToDoList'
     page.theme_mode = ft.ThemeMode.DARK
+
+
+
+        # --- Inside your main(page: ft.Page) function ---
+
+    def clear_completed_tasks(_):
+        # 1. Nuke them from the DB
+        main_db.delete_completed_tasks()
+        # 2. Refresh the UI list
+        load_task()
+        # 3. Optional: Snack bar for feedback
+        page.snack_bar = ft.SnackBar(ft.Text("Completed tasks cleared!"))
+        page.snack_bar.open = True
+        page.update()
+
+    # Create the button
+    clear_button = ft.ElevatedButton(
+        "Clear Completed", 
+        icon=ft.Icons.DELETE_SWEEP, 
+        color=ft.Colors.RED_400,
+        on_click=clear_completed_tasks
+    )
+
+    # --- Update your layout at the bottom ---
+    # I suggest adding the clear button to your filter_buttons row
+    filter_buttons = ft.Row([
+       ft.ElevatedButton("All", on_click=lambda e: set_filter('all')),
+       ft.ElevatedButton('In Progress', on_click=lambda e: set_filter('uncompleted')),
+      ft.ElevatedButton("Done ✅", on_click=lambda e: set_filter('completed')),
+       clear_button # <--- Our new friend
+    ], alignment=ft.MainAxisAlignment.SPACE_EVENLY)
 
     # edit theme
     def edit_theme(_):
@@ -25,6 +57,7 @@ def main(page: ft.Page):
         title=ft.Text("My Tasks"),
         actions=[theme_icon]
     )
+    
     
 
     
@@ -75,7 +108,9 @@ def main(page: ft.Page):
     
     def toggle_task(task_id, is_completed):
         main_db.update_task(task_id=task_id, completed=int(is_completed))
-        page.update()
+        load_task() # <-- Refresh the list immediately!
+
+
 
     # Время записи задачи
     def add_task_db(_):
@@ -91,24 +126,46 @@ def main(page: ft.Page):
 
     
 
+# 1. Setup the input row
     task_input = ft.TextField(label='Write a Task', expand=True, on_submit=add_task_db)
     send_button = ft.ElevatedButton('SEND', on_click=add_task_db)
     main_objects = ft.Row([task_input, send_button])
 
+    # 2. Setup the Filter logic
     def set_filter(filter_value):
         nonlocal filter_type
         filter_type = filter_value
         load_task()
 
+    # 3. Create the Clear Button (The one that was missing!)
+    def clear_completed_tasks(_):
+        main_db.delete_completed_tasks()
+        load_task()
+        page.snack_bar = ft.SnackBar(ft.Text("Completed tasks cleared!"))
+        page.snack_bar.open = True
+        page.update()
+
+    clear_button = ft.ElevatedButton(
+        "Clear Done", 
+        icon=ft.Icons.DELETE_SWEEP, 
+        color=ft.Colors.RED_400,
+        on_click=clear_completed_tasks
+    )
+
+    # 4. SINGLE definition of filter_buttons
     filter_buttons = ft.Row([
-        ft.ElevatedButton("All to do's", on_click=lambda e: set_filter('all')),
+        ft.ElevatedButton("All", on_click=lambda e: set_filter('all')),
         ft.ElevatedButton('In Progress', on_click=lambda e: set_filter('uncompleted')),
-        ft.ElevatedButton("Done ✅", on_click=lambda e: set_filter('completed'))
+        ft.ElevatedButton("Done ✅", on_click=lambda e: set_filter('completed')),
+        clear_button # <-- Adding it here once and for all
     ], alignment=ft.MainAxisAlignment.SPACE_EVENLY)
 
+    # 5. Add everything to the page
     page.add(main_objects, filter_buttons, task_list)
     load_task()
 
 if __name__ == '__main__':
     main_db.init_db()
     ft.app(target=main)
+
+    # it's done bro
