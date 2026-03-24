@@ -19,7 +19,7 @@ select_task_uncompleted = 'SELECT id, task, completed FROM tasks WHERE completed
 update_task = "UPDATE tasks SET task = ? WHERE id = ?"
 
 delete_task = "DELETE FROM tasks WHERE id = ?"
-
+# the delete function
 delete_completed_tasks = "DELETE FROM tasks WHERE completed = 1"
 
 

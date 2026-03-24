@@ -9,15 +9,12 @@ def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.DARK
 
 
-
-        # --- Inside your main(page: ft.Page) function ---
-
     def clear_completed_tasks(_):
-        # 1. Nuke them from the DB
+        # 1 Nuke them from the DB
         main_db.delete_completed_tasks()
-        # 2. Refresh the UI list
+        # 2 Refresh the UI list
         load_task()
-        # 3. Optional: Snack bar for feedback
+        # 3 Optional: Snack bar for feedback
         page.snack_bar = ft.SnackBar(ft.Text("Completed tasks cleared!"))
         page.snack_bar.open = True
         page.update()
@@ -30,13 +27,13 @@ def main(page: ft.Page):
         on_click=clear_completed_tasks
     )
 
-    # --- Update your layout at the bottom ---
-    # I suggest adding the clear button to your filter_buttons row
+    
+    # suggest adding the clear button to  filter_buttons row
     filter_buttons = ft.Row([
        ft.ElevatedButton("All", on_click=lambda e: set_filter('all')),
        ft.ElevatedButton('In Progress', on_click=lambda e: set_filter('uncompleted')),
       ft.ElevatedButton("Done ✅", on_click=lambda e: set_filter('completed')),
-       clear_button # <--- Our new friend
+       clear_button # new friend
     ], alignment=ft.MainAxisAlignment.SPACE_EVENLY)
 
     # edit theme
@@ -108,7 +105,7 @@ def main(page: ft.Page):
     
     def toggle_task(task_id, is_completed):
         main_db.update_task(task_id=task_id, completed=int(is_completed))
-        load_task() # <-- Refresh the list immediately!
+        load_task() # <- Refresh the list immediately!
 
 
 
